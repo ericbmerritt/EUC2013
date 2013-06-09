@@ -1,9 +1,11 @@
 {application, echo_get,
- [{description, "echo_get Example"},
-  {vsn, "0.0.1"},
+ [{description, "Cowboy GET echo example."},
+  {vsn, "semver"},
   {modules, []},
-  {registered, [echo_get_sup]},
+  {registered, []},
   {applications, [kernel,
                   stdlib,
+                  ranch,
                   cowboy]},
-  {mod, {echo_get, []}}]}.
+  {mod, {echo_get_app, []}},
+  {env, []}]}.

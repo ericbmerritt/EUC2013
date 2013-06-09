@@ -1,23 +1,37 @@
+%%%-------------------------------------------------------------------
+%%% @author Eric Merritt <ericbmerritt@gmail.com>
+%%% @copyright (C) Erlware
+%%% @doc
+%%%  GET echo handler.
+%%% @end
+%%%-------------------------------------------------------------------
 -module(echo_get_handler).
--export([init/3, handle/2, terminate/2]).
 
-init({tcp, http}, Req, _Opts) ->
-    {ok, Req, undefined_state}.
+-export([init/3,
+         handle/2,
+         terminate/3]).
+
+%%%===================================================================
+%%% Http handler callbacks
+%%%===================================================================
+
+init(_Transport, Req, []) ->
+    {ok, Req, undefined}.
 
 handle(Req, State) ->
-    Reply = case cowboy_http_req:method(Req) of 
-        {'GET', _} -> 
-            GetMsg = case cowboy_http_req:qs_val(<<"echo_get">>, Req) of
-                {undefined, _} -> <<"no echo_get querystring parameter">>;
-                {X, _} -> X
-            end, 
-            {ok, R} = cowboy_http_req:reply(200, [], ["echo_get: ", GetMsg], Req),
-            R;
-        _ -> 
-            {ok, R} = cowboy_http_req:reply(200, [], <<"Not GET'd">>, Req),
-            R
-    end,
-    {ok, Reply, State}.
+    {Method, Req2} = cowboy_req:method(Req),
+    {Echo, Req3} = cowboy_req:qs_val(<<"echo">>, Req2),
+    {ok, Req4} = echo(Method, Echo, Req3),
+    {ok, Req4, State}.
 
-terminate(_Req, _State) ->
+echo(<<"GET">>, undefined, Req) ->
+    cowboy_req:reply(400, [], <<"Missing echo parameter.">>, Req);
+echo(<<"GET">>, Echo, Req) ->
+    cowboy_req:reply(200,
+                     [{<<"content-encoding">>, <<"utf-8">>}], Echo, Req);
+echo(_, _, Req) ->
+    %% Method not allowed.
+    cowboy_req:reply(405, Req).
+
+terminate(_Reason, _Req, _State) ->
     ok.

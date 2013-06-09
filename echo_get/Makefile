@@ -5,7 +5,7 @@
 ERL = $(shell which erl)
 ERL_VER = $(shell erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell)
 
-ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/*/ebin
+ERLFLAGS= -pa $(CURDIR)/.eunit -pa $(CURDIR)/ebin -pa $(CURDIR)/deps/**/ebin
 
 REBAR=$(shell which rebar)
 
@@ -87,5 +87,5 @@ distclean: clean
 
 rebuild: distclean all
 
-release: test
+release: compile test
 	rebar release

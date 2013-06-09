@@ -2,16 +2,18 @@
 %%% @author Eric Merritt <ericbmerritt@gmail.com>
 %%% @copyright (C) Erlware
 %%%-------------------------------------------------------------------
--module(echo_get).
+-module(echo_get_app).
+-behaviour(application).
 
 %% API.
--export([manual_start/0]).
+-export([start/2,
+         stop/1]).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
-manual_start() ->
-    ok = application:start(crypto),
-    ok = application:start(ranch),
-    ok = application:start(cowboy),
-    ok = application:start(echo_get).
+start(_Type, _Args) ->
+    echo_get_sup:start_link().
+
+stop(_State) ->
+        ok.
