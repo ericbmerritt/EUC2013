@@ -1,0 +1,14 @@
+---
+# This role exists to provide a base development environment. It does
+# not create or setup any depnendencies. it simply installs all of the
+# build tools that may be needed.
+
+- hosts: euc2013
+  user: vagrant
+  sudo_user: root
+  sudo: true
+
+  tasks:
+
+    - name: Install erlang
+      action: apt pkg=erlang state=latest
