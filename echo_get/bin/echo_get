@@ -1,0 +1,82 @@
+ #! /bin/sh
+#
+# A sample init script for managing an erld application
+#
+
+NAME=echo_get
+export HOME="./"
+RELEASE_BASE="$HOME/_rel"
+COOKIE=oatmealraisin
+COMMAND="%{release}/bin/echo_get -name '%{fullnode}' -setcookie '%{cookie}' +Ktrue +B -noinput -shutdown_time 5000 +W w"
+CHECK="erlang statistics [reductions]"
+CHECK_REGEX="^{\\d+, \\d+}$"
+CHECK_INTERVAL=30
+STARTUP_TIME=20
+
+ERLNIXIFY="erlnixify "
+ERLNIXIFY_ARGS=" --name $NAME \
+          --cookie $COOKIE \
+          --release $RELEASE_BASE \
+          --command '$COMMAND' \
+          --check '$CHECK' \
+          --checkregex '$CHECK_REGEX' \
+          --checkinterval $CHECK_INTERVAL \
+          --startuptimeout 20 "
+
+PIDFILE=./$NAME.pid
+LOCKDIR=./lock
+LOCKFILE=$LOCKDIR/$NAME
+
+start()
+{
+    # Make sure epmd is running. There's no harm in running it
+    # several times and it doesn't need to be stopped so just run
+    # it simply here every time.
+    epmd -daemon
+    eval "$ERLNIXIFY startdeamon $ERLNIXIFY_ARGS"
+}
+
+stop()
+{
+    eval "$ERLNIXIFY stop $ERLNIXIFY_ARGS"
+}
+
+status()
+{
+    eval "$ERLNIXIFY status $ERLNIXIFY_ARGS"
+}
+
+show()
+{
+    echo "The server is started in the following environmnent:"
+    echo "(HOME is already set when running interactively.)"
+    echo "export HOME='$HOME'"
+    echo "The command used to start the server is:"
+    echo "$COMMAND"
+    echo "The command run by erlixify is:"
+    echo "$ERLNIXIFY"
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    show)
+        show
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: /etc/init.d/echo_get {start|stop|restart|show}"
+        exit 1
+esac
+
+exit $RETVAL

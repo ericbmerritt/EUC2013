@@ -76,10 +76,12 @@ shell: compile
 
 clean:
 	$(REBAR) skip_deps=true clean
-	- rm $(CURDIR)/doc/*.html
-	- rm $(CURDIR)/doc/*.css
-	- rm $(CURDIR)/doc/*.png
-	- rm $(CURDIR)/doc/edoc-info
+	rm -rf $(CURDIR)/doc/*.html
+	rm -rf $(CURDIR)/doc/*.css
+	rm -rf $(CURDIR)/doc/*.png
+	rm -rf $(CURDIR)/doc/edoc-info
+	rm -rf $(CURDIR)/_rel
+	rm -rf $(CURDIR)/rel
 
 distclean: clean
 	rm -rf $(URI_PLT).$(ERL_VER)
